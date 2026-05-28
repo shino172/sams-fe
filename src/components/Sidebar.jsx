@@ -1,28 +1,33 @@
-import React from 'react';
-import { 
-  LayoutDashboard, 
-  Sprout, 
-  FileText, 
-  Users, 
-  Layers, 
-  Moon, 
-  Sun, 
-  ArrowRightLeft 
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Sprout,
+  FileText,
+  Users,
+  Layers,
+  BarChart3,
+  Calendar,
+  LogOut,
 } from 'lucide-react';
 
-export default function Sidebar({ 
-  currentTab, 
-  setCurrentTab, 
-  currentRole, 
-  toggleRole, 
-  isDarkMode, 
-  toggleDarkMode 
-}) {
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'crops', label: 'Quản Lý Vụ Mùa', icon: Sprout },
-    { id: 'logs', label: 'Nhật Ký Canh Tác', icon: FileText },
+export default function Sidebar({ role, userName, onLogout }) {
+  const coopItems = [
+    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/farmers', label: 'Nông dân', icon: Users },
+    { to: '/fields', label: 'Lô đất', icon: Layers },
+    { to: '/crop-seasons', label: 'Vụ mùa', icon: Sprout },
+    { to: '/logs', label: 'Nhật ký', icon: FileText },
+    { to: '/reports', label: 'Báo cáo', icon: BarChart3 },
   ];
+
+  const farmerItems = [
+    { to: '/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
+    { to: '/my-crops', label: 'Vụ mùa của tôi', icon: Sprout },
+    { to: '/logs', label: 'Nhật ký', icon: FileText },
+    { to: '/schedule', label: 'Lịch trình', icon: Calendar },
+  ];
+
+  const navItems = role === 'cooperative_admin' ? coopItems : farmerItems;
 
   return (
     <aside className="sidebar">
@@ -32,7 +37,7 @@ export default function Sidebar({
         </div>
         <div className="brand-text">
           <h2>SAMS</h2>
-          <p>Nông Nghiệp Số Hiện Đại</p>
+          <p>Nông Nghiệp Số</p>
         </div>
       </div>
 
@@ -40,43 +45,35 @@ export default function Sidebar({
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
-            <div
-              key={item.id}
-              className={`nav-item ${currentTab === item.id ? 'active' : ''}`}
-              onClick={() => setCurrentTab(item.id)}
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <Icon size={20} />
               <span>{item.label}</span>
-            </div>
+            </NavLink>
           );
         })}
       </nav>
 
       <div className="sidebar-footer">
-        <button 
-          onClick={toggleRole} 
-          className="btn btn-secondary" 
-          style={{ 
-            width: '100%', 
-            fontSize: '0.85rem', 
-            padding: '10px', 
-            justifyContent: 'flex-start',
-            gap: '10px'
-          }}
-        >
-          <ArrowRightLeft size={16} />
-          <span>Vai trò: <strong>{currentRole === 'coop' ? 'Hợp Tác Xã' : 'Nông Dân'}</strong></span>
-        </button>
-
         <div className="user-profile">
-          <div className="user-avatar">
-            {currentRole === 'coop' ? 'HTX' : 'ND'}
-          </div>
+          <div className="user-avatar">{role === 'cooperative_admin' ? 'HTX' : 'ND'}</div>
           <div className="user-info">
-            <h4>{currentRole === 'coop' ? 'Trần Quốc Bảo' : 'Nguyễn Văn Ruộng'}</h4>
-            <p>{currentRole === 'coop' ? 'Quản lý HTX' : 'Hộ canh tác số 04'}</p>
+            <h4>{userName}</h4>
+            <p>{role === 'cooperative_admin' ? 'Quản lý HTX' : 'Nông dân'}</p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="btn btn-secondary"
+          style={{ width: '100%', marginTop: 12, justifyContent: 'flex-start', gap: 8 }}
+        >
+          <LogOut size={16} />
+          Đăng xuất
+        </button>
       </div>
     </aside>
   );
